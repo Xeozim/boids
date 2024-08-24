@@ -26,3 +26,22 @@ you can find [here](https://docs.monogame.net/articles/getting_started/index.htm
 - Run the command to setup a new MonoGame project
 
 `dotnet new mgdesktopgl`
+
+## Running
+
+Just type this command in a powershell terminal in the root directory
+
+`dotnet run`
+
+## Project Architecture
+
+The architecture is very simple, it's based on a previous implementation I did.
+
+There's a Boid class which represents a single boid; it has properties for the
+position and velocity of the boid, and contains all the logic for updating the
+position and velocity based on the 3 rules (separation, cohesion, alignment).
+
+The main game loop is just managed by Boids.cs, which implements a child class
+of the main Game class required by MonoGame. This class creates the boids and
+updates them all on every frame, and contains the code for drawing them to the
+screen.

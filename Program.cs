@@ -1,2 +1,2 @@
-﻿using var game = new boids.Game1();
+﻿using var game = new boids.BoidsGame();
 game.Run();
