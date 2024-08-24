@@ -119,8 +119,6 @@ public class BoidsGame : Game
 
         // Set the vertex buffer to the graphics device
         GraphicsDevice.SetVertexBuffer(_vertexBuffer);
-        // Set the vertex buffer to the graphics device
-        GraphicsDevice.SetVertexBuffer(_vertexBuffer);
 
         // Draw each boid by offsetting the standard set of vertices
         // No rotation for now.

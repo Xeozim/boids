@@ -45,3 +45,42 @@ The main game loop is just managed by Boids.cs, which implements a child class
 of the main Game class required by MonoGame. This class creates the boids and
 updates them all on every frame, and contains the code for drawing them to the
 screen.
+
+## Rendering
+
+One of the elements that's new to me with this implementation is how the boids
+are drawn. Previously I would use built in shapes or game engines which do most
+of it for you.
+
+Here each triangle is drawn to the screen individually (although we can batch
+multiple draws together). The way I've used this is as follows:
+
+- `_boidVertices` sets the standard shape of a boid by defining the positions of
+  its vertices. See below for more detail on this
+- `_vertexBuffer` is a buffer we use to send data to the GPU, because all the
+  boids will have the same shape we can do this once in the initialisation and
+  then use different projection matrices to control where on the screen the
+  shape is actually drawn
+- `_basicEffect` is also created during initialisation and defines the effects
+  used for drawing which in this case includes the camera definition we're
+  assuming, the colour to use when drawing, and a projection matrix to apply
+- When drawing, we update the projection matrix of the effect before drawing
+  each individual boid in order to rotate the shape to match the boid's heading
+  (purely defined by velocity) and translate it to the boid's position
+
+### Vertex winding
+
+Notes on the contents of `_boidVertices`:
+
+- The default orientation points down and is then rotated according to the
+  heading of the boid. Even though in my head the default orientation would
+  point up I don't have the maths worked out to get that to work
+- The vertices are defined in two sets of three, one for each triangle that
+  makes up the final shape
+- The order of the vertices within a triangle is important, in this case they
+  are defined in clockwise order. The order (known as winding order) tells the
+  renderer which direction the triangle faces so that in 3D applications it can
+  ignore triangles facing away from the camera (backface culling).
+  [See also](https://www.khronos.org/opengl/wiki/Face_Culling).
+
+![Boid Triangles](boid_tri_winding.svg)
