@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,7 +12,7 @@ public class BoidsGame : Game
     private BasicEffect _basicEffect;
     private VertexBuffer _vertexBuffer;
 
-    private Boid[] _boids;
+    private List<Boid> _boids;
     
     // Shared RNG
     private static readonly Random _rng = new();
@@ -24,7 +25,7 @@ public class BoidsGame : Game
     // Boid Count at initialisation
     private static readonly int _initialBoidCount = 25;
     // Maximum initialisation velocity
-    private static readonly float _maxInitialVelocity = 10;
+    private static readonly float _maxInitialVelocity = 5;
     
     // Standard non-rotated vertex position of the boid polygon
     // Split into two triangles for each half of the boid
@@ -72,9 +73,9 @@ public class BoidsGame : Game
         _graphics.ApplyChanges();
         
         // Create boids at the centre of the screen with random velocities
-        _boids = new Boid[_initialBoidCount];
+        _boids = new List<Boid>(_initialBoidCount);
         for (int i=0; i<_initialBoidCount; i++){
-            _boids[i] = new Boid(RandomVector2() * _maxInitialVelocity,RandomVector2(_worldLimits.Min,_worldLimits.Max));
+            _boids.Add(new Boid(i, RandomVector2() * _maxInitialVelocity,RandomVector2(_worldLimits.Min,_worldLimits.Max)));
         }
 
         // Create the vertex buffer used for drawing the boids
@@ -104,7 +105,7 @@ public class BoidsGame : Game
 
         // Update logic here
         foreach(Boid boid in _boids){
-            boid.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            boid.Update((float)gameTime.ElapsedGameTime.TotalSeconds, _boids);
         }
 
         base.Update(gameTime);
@@ -133,7 +134,7 @@ public class BoidsGame : Game
     private void DrawBoid(Boid boid)
     {
         // Rotate the draw effect according to the boid heading and translate to it's position
-        _basicEffect.World = Matrix.CreateRotationZ(boid.Heading) * Matrix.CreateTranslation(new Vector3(boid.Position, 0));
+        _basicEffect.World = Matrix.CreateRotationZ((float)Math.Atan2(boid.Velocity.X, -boid.Velocity.Y)) * Matrix.CreateTranslation(new Vector3(boid.Position, 0));
 
         // Apply the BasicEffect settings
         foreach (EffectPass pass in _basicEffect.CurrentTechnique.Passes)
