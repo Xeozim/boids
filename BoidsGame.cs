@@ -12,14 +12,24 @@ public class BoidsGame : Game
     private VertexBuffer _vertexBuffer;
 
     private Boid[] _boids;
+    
+    // Shared RNG
+    private static readonly Random _rng = new();
+
+    //// Settings
 
     // Limits of the world. 100x100
-    private static BoundingBox worldLimits = new BoundingBox(new Vector3(-50,-50,0),new Vector3(50,50,0));
+    private static BoundingBox _worldLimits = new BoundingBox(new Vector3(-50,-50,0),new Vector3(50,50,0));
+
+    // Boid Count at initialisation
+    private static readonly int _initialBoidCount = 25;
+    // Maximum initialisation velocity
+    private static readonly float _maxInitialVelocity = 10;
     
     // Standard non-rotated vertex position of the boid polygon
     // Split into two triangles for each half of the boid
     // Note each triangle's vertices should be in clockwise winding order 
-    private static VertexPosition[] boidVertices =
+    private static readonly VertexPosition[] _boidVertices =
     [
         new VertexPosition(new Vector3( 0.0f,-1.0f, 0)),    // Front
         new VertexPosition(new Vector3(-0.5f, 1.0f, 0)),    // Left tail point
@@ -37,6 +47,20 @@ public class BoidsGame : Game
         IsMouseVisible = true;
     }
 
+    // Utilities
+    protected static float RandomFloat(float min, float max){
+        return (float) _rng.NextDouble() * (max - min) + min;
+    }
+    // With no args generate a random unit vector
+    protected static Vector2 RandomVector2(){
+        Vector2 rtn = new(RandomFloat(-1,1),RandomFloat(-1,1));
+        rtn.Normalize();
+        return rtn;
+    }
+    protected static Vector2 RandomVector2(Vector3 min, Vector3 max){
+        return new Vector2(RandomFloat(min.X,max.X),RandomFloat(min.Y,max.Y));
+    }
+
     protected override void Initialize()
     {
         // Add initialization logic here
@@ -47,21 +71,22 @@ public class BoidsGame : Game
         _graphics.PreferredBackBufferHeight = 1280;
         _graphics.ApplyChanges();
         
-        // Create a single boid at the centre of the screen with random velocity
-        Random rnd = new Random();
-        Vector2 vel = new Vector2((float)rnd.NextDouble()-0.5f, (float)rnd.NextDouble()-0.5f) * 10;
-        _boids = [new Boid(Vector2.Zero, vel)];
+        // Create boids at the centre of the screen with random velocities
+        _boids = new Boid[_initialBoidCount];
+        for (int i=0; i<_initialBoidCount; i++){
+            _boids[i] = new Boid(RandomVector2() * _maxInitialVelocity,RandomVector2(_worldLimits.Min,_worldLimits.Max));
+        }
 
         // Create the vertex buffer used for drawing the boids
-        _vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPosition), boidVertices.Length, BufferUsage.WriteOnly);
-        _vertexBuffer.SetData(boidVertices);
+        _vertexBuffer = new VertexBuffer(GraphicsDevice, typeof(VertexPosition), _boidVertices.Length, BufferUsage.WriteOnly);
+        _vertexBuffer.SetData(_boidVertices);
 
         // Initialize the BasicEffect for rendering
         _basicEffect = new BasicEffect(GraphicsDevice)
         {
             DiffuseColor = Color.White.ToVector3(),
             View = Matrix.CreateLookAt(Vector3.Backward, Vector3.Zero, Vector3.Up),
-            Projection = Matrix.CreateOrthographicOffCenter(worldLimits.Min.X, worldLimits.Max.X, worldLimits.Min.Y, worldLimits.Max.Y, 0, 1)
+            Projection = Matrix.CreateOrthographicOffCenter(_worldLimits.Min.X, _worldLimits.Max.X, _worldLimits.Min.Y, _worldLimits.Max.Y, 0, 1)
         };
 
         base.Initialize();
