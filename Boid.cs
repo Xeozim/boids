@@ -32,7 +32,7 @@ public class Boid
 
     // Rule factors
     // Separation factor, how much the boid steers away from nearby boids
-    private static float _seperationFactor = 0.5f;
+    private static float _seperationFactor = 0.25f;
     public static float SeperationFactor { get => _seperationFactor; set => _seperationFactor = value; }
     // Separation range, how close a boid has to be before we try to avoid it
     private static float _seperationRange = 1.0f;

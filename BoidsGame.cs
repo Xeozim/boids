@@ -23,9 +23,9 @@ public class BoidsGame : Game
     private static BoundingBox _worldLimits = new BoundingBox(new Vector3(-50,-50,0),new Vector3(50,50,0));
 
     // Boid Count at initialisation
-    private static readonly int _initialBoidCount = 100;
+    private static readonly int _initialBoidCount = 200;
     // Maximum initialisation velocity
-    private static readonly float _maxInitialVelocity = 5;
+    private static readonly float _maxInitialVelocity = 25;
     
     // Standard non-rotated vertex position of the boid polygon
     // Split into two triangles for each half of the boid
@@ -75,7 +75,7 @@ public class BoidsGame : Game
         // Create boids at the centre of the screen with random velocities
         _boids = new List<Boid>(_initialBoidCount);
         for (int i=0; i<_initialBoidCount; i++){
-            _boids.Add(new Boid(i, RandomVector2() * _maxInitialVelocity,RandomVector2(_worldLimits.Min,_worldLimits.Max)));
+            _boids.Add(new Boid(i, Vector2.Zero, RandomVector2() * _maxInitialVelocity));
         }
 
         // Create the vertex buffer used for drawing the boids
