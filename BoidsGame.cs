@@ -23,7 +23,7 @@ public class BoidsGame : Game
     private static BoundingBox _worldLimits = new BoundingBox(new Vector3(-50,-50,0),new Vector3(50,50,0));
 
     // Boid Count at initialisation
-    private static readonly int _initialBoidCount = 25;
+    private static readonly int _initialBoidCount = 100;
     // Maximum initialisation velocity
     private static readonly float _maxInitialVelocity = 5;
     
@@ -105,7 +105,7 @@ public class BoidsGame : Game
 
         // Update logic here
         foreach(Boid boid in _boids){
-            boid.Update((float)gameTime.ElapsedGameTime.TotalSeconds, _boids);
+            boid.Update((float)gameTime.ElapsedGameTime.TotalSeconds, _boids, _worldLimits);
         }
 
         base.Update(gameTime);

@@ -45,7 +45,7 @@ public class Boid
     public static float CohesionFactor { get => _cohesionFactor; set => _cohesionFactor = value; }
 
     // Limitations
-    private static float _speedLimit = 10;
+    private static float _speedLimit = 50;
     public static float SpeedLimit { get => _speedLimit; set => _speedLimit = value; }
 
     public Boid(int id, Vector2 position, Vector2 velocity)
@@ -69,7 +69,7 @@ public class Boid
 
     // Update the position and velocity of the boid
     // dt is the amount of time that passed since the last update in seconds
-    public void Update(float dt, List<Boid> allBoids)
+    public void Update(float dt, List<Boid> allBoids, BoundingBox worldLimits)
     {
         // Calculate new velocity from the rules
         Vector2 newVelocity = _velocity;
@@ -99,9 +99,20 @@ public class Boid
             newVelocity += seperationComponent + alignmentComponent + cohesionComponent;
         }
 
+        // Apply speed limit to new velocity
+        if (newVelocity.Length() > _speedLimit){
+            newVelocity.Normalize();
+            newVelocity *= _speedLimit;
+        }
         _velocity = newVelocity;
 
         // Apply velocity to position
         _position += _velocity * dt;
+
+        // If we're outside of the limits of the world, teleport to the other edge
+        if (_position.X > worldLimits.Max.X) {_position.X = _position.X - worldLimits.Max.X + worldLimits.Min.X; }
+        if (_position.X < worldLimits.Min.X) {_position.X = _position.X - worldLimits.Min.X + worldLimits.Max.X; }
+        if (_position.Y > worldLimits.Max.Y) {_position.Y = _position.Y - worldLimits.Max.Y + worldLimits.Min.Y; }
+        if (_position.Y < worldLimits.Min.Y) {_position.Y = _position.Y - worldLimits.Min.Y + worldLimits.Max.Y; }
     }
 }
